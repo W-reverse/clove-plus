@@ -38,17 +38,37 @@ class OAuthAuthenticator:
         )
         return verifier, challenge
 
-    def _build_headers(self, cookie: str) -> Dict[str, str]:
+    def _normalize_cookie(self, cookie: str) -> str:
+        """Normalize cookie to ensure it has sessionKey= prefix."""
+        cookie = cookie.strip()
+        if not cookie:
+            return cookie
+
+        if any(part.strip().startswith("sessionKey=") for part in cookie.split(";")):
+            return cookie
+
+        return f"sessionKey={cookie}"
+
+    def _build_headers(
+        self, cookie: str, endpoint: Optional[str] = None
+    ) -> Dict[str, str]:
         """Build request headers."""
-        claude_endpoint = settings.claude_ai_url.encoded_string().rstrip("/")
+        if endpoint:
+            parsed_endpoint = urlparse(endpoint)
+            if parsed_endpoint.scheme and parsed_endpoint.netloc:
+                endpoint = f"{parsed_endpoint.scheme}://{parsed_endpoint.netloc}"
+            endpoint = endpoint.rstrip("/")
+        else:
+            endpoint = settings.claude_ai_url.encoded_string().rstrip("/")
+        normalized_cookie = self._normalize_cookie(cookie)
 
         return {
             "Accept": "application/json",
             "Accept-Language": "en-US,en;q=0.9",
             "Cache-Control": "no-cache",
-            "Cookie": cookie,
-            "Origin": claude_endpoint,
-            "Referer": f"{claude_endpoint}/new",
+            "Cookie": normalized_cookie,
+            "Origin": endpoint,
+            "Referer": f"{endpoint}/new",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         }
 
@@ -152,7 +172,7 @@ class OAuthAuthenticator:
             "code_challenge_method": "S256",
         }
 
-        headers = self._build_headers(cookie)
+        headers = self._build_headers(cookie, endpoint=authorize_url)
         headers["Content-Type"] = "application/json"
 
         logger.debug(f"Requesting authorization from: {authorize_url}")

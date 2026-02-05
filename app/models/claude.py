@@ -136,8 +136,9 @@ class ToolChoice(BaseModel):
 class Tool(BaseModel):
     model_config = ConfigDict(extra="allow")
     name: str
-    input_schema: Any
+    input_schema: Any | None = None
     description: Optional[str] = None
+    type: Optional[str] = None
 
 
 class ServerToolUsage(BaseModel):

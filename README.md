@@ -148,7 +148,7 @@ PORT=5201
 ADMIN_API_KEYS==your-secret-key
 
 # Claude.ai Cookie
-COOKIES=sessionKey=your-session-key
+COOKIES=sessionKey=sk-ant-sid02-...
 ```
 
 更多配置请见 `.env.example` 文件。

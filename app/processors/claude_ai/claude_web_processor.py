@@ -8,7 +8,7 @@ from loguru import logger
 from app.processors.base import BaseProcessor
 from app.processors.claude_ai import ClaudeAIContext
 from app.services.session import session_manager
-from app.models.internal import ClaudeWebRequest, Attachment
+from app.models.internal import Attachment, ClaudeWebRequest, ClaudeWebTool
 from app.core.exceptions import NoValidMessagesError
 from app.core.config import settings
 from app.utils.messages import process_messages
@@ -99,15 +99,26 @@ class ClaudeWebProcessor(BaseProcessor):
 
             paprika_mode = (
                 "extended"
-                if (
-                    context.claude_session.account.is_pro
-                    and request.thinking
-                    and request.thinking.type == "enabled"
-                )
+                if (request.thinking and request.thinking.type == "enabled")
                 else None
             )
+            try:
+                await context.claude_session.set_paprika_mode(paprika_mode)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to set paprika_mode={paprika_mode!r} for conversation: {e}"
+                )
 
-            await context.claude_session.set_paprika_mode(paprika_mode)
+            requested_web_search = any(
+                (
+                    tool.name == "web_search"
+                    or (getattr(tool, "type", None) or "").startswith("web_search")
+                )
+                for tool in (request.tools or [])
+            )
+            web_tools: List[ClaudeWebTool] = []
+            if settings.web_search or requested_web_search:
+                web_tools.append(ClaudeWebTool.web_search())
 
             web_request = ClaudeWebRequest(
                 max_tokens_to_sample=request.max_tokens,
@@ -117,7 +128,7 @@ class ClaudeWebProcessor(BaseProcessor):
                 rendering_mode="messages",
                 prompt=settings.custom_prompt or "",
                 timezone="UTC",
-                tools=request.tools or [],
+                tools=web_tools,
             )
 
             context.claude_web_request = web_request

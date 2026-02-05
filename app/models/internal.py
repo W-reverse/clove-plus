@@ -1,6 +1,6 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
-from .claude import Tool
+
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class Attachment(BaseModel):
@@ -20,6 +20,17 @@ class Attachment(BaseModel):
         )
 
 
+class ClaudeWebTool(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    name: str
+    type: str
+
+    @classmethod
+    def web_search(cls) -> "ClaudeWebTool":
+        return cls(name="web_search", type="web_search_v0")
+
+
 class ClaudeWebRequest(BaseModel):
     max_tokens_to_sample: int
     attachments: List[Attachment]
@@ -28,7 +39,7 @@ class ClaudeWebRequest(BaseModel):
     rendering_mode: str = "messages"
     prompt: str = ""
     timezone: str
-    tools: List[Tool] = Field(default_factory=list)
+    tools: List[ClaudeWebTool] = Field(default_factory=list)
 
 
 class UploadResponse(BaseModel):

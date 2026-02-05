@@ -62,11 +62,26 @@ class Settings(BaseSettings):
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
                     config_data = json.load(f)
+                    config_data = cls._migrate_legacy_oauth_endpoints(config_data)
                     return config_data
             except (json.JSONDecodeError, IOError):
                 # If there's an error reading the JSON, just return empty dict
                 return {}
         return {}
+
+    @staticmethod
+    def _migrate_legacy_oauth_endpoints(config_data: Dict[str, Any]) -> Dict[str, Any]:
+        oauth_token_url = config_data.get("oauth_token_url")
+        if oauth_token_url == "https://console.anthropic.com/v1/oauth/token":
+            config_data["oauth_token_url"] = "https://api.anthropic.com/v1/oauth/token"
+
+        oauth_authorize_url = config_data.get("oauth_authorize_url")
+        if oauth_authorize_url == "https://claude.ai/v1/oauth/{organization_uuid}/authorize":
+            config_data["oauth_authorize_url"] = (
+                "https://api.anthropic.com/v1/oauth/{organization_uuid}/authorize"
+            )
+
+        return config_data
 
     # Server settings
     host: str = Field(default="0.0.0.0", env="HOST")
@@ -157,6 +172,11 @@ class Settings(BaseSettings):
 
     # Feature flags
     preserve_chats: bool = Field(default=False, env="PRESERVE_CHATS")
+    web_search: bool = Field(
+        default=False,
+        env="WEB_SEARCH",
+        description="Enable Claude.ai built-in web_search tool for ClaudeWebProcessor (cookie-based Claude.ai web requests).",
+    )
 
     # Logging
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
@@ -237,12 +257,12 @@ class Settings(BaseSettings):
         description="OAuth client ID for Claude authentication",
     )
     oauth_authorize_url: str = Field(
-        default="https://claude.ai/v1/oauth/{organization_uuid}/authorize",
+        default="https://api.anthropic.com/v1/oauth/{organization_uuid}/authorize",
         env="OAUTH_AUTHORIZE_URL",
         description="OAuth authorization endpoint URL template",
     )
     oauth_token_url: str = Field(
-        default="https://console.anthropic.com/v1/oauth/token",
+        default="https://api.anthropic.com/v1/oauth/token",
         env="OAUTH_TOKEN_URL",
         description="OAuth token exchange endpoint URL",
     )

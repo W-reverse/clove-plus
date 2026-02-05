@@ -27,6 +27,7 @@ class SettingsRead(BaseModel):
     allow_external_images: bool
 
     preserve_chats: bool
+    web_search: bool
 
     oauth_client_id: str
     oauth_authorize_url: str
@@ -53,6 +54,7 @@ class SettingsUpdate(BaseModel):
     allow_external_images: bool | None = None
 
     preserve_chats: bool | None = None
+    web_search: bool | None = None
 
     oauth_client_id: str | None = None
     oauth_authorize_url: str | None = None

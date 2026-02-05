@@ -33,6 +33,9 @@ services:
       # - CLAUDE_AI_URL=https://claude.ai
       # - CLAUDE_API_BASEURL=https://api.anthropic.com
 
+      # Feature flags
+      - WEB_SEARCH=true
+
       # Logging
       - LOG_LEVEL=INFO
       - LOG_TO_FILE=true

@@ -45,15 +45,27 @@ class ClaudeWebClient:
         if self.session:
             await self.session.close()
 
+    def _normalize_cookie(self, cookie: str) -> str:
+        """Normalize cookie to ensure it has sessionKey= prefix."""
+        cookie = cookie.strip()
+        if not cookie:
+            return cookie
+
+        if any(part.strip().startswith("sessionKey=") for part in cookie.split(";")):
+            return cookie
+
+        return f"sessionKey={cookie}"
+
     def _build_headers(
         self, cookie: str, conv_uuid: Optional[str] = None
     ) -> Dict[str, str]:
         """Build request headers."""
+        normalized_cookie = self._normalize_cookie(cookie)
         headers = {
             "Accept": "text/event-stream",
             "Accept-Language": "en-US,en;q=0.9",
             "Cache-Control": "no-cache",
-            "Cookie": cookie,
+            "Cookie": normalized_cookie,
             "Origin": self.endpoint,
             "Referer": f"{self.endpoint}/new",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
