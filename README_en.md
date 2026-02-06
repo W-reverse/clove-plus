@@ -12,6 +12,24 @@
 
 </div>
 
+## This is a personally maintained latest version
+
+Original project URL: https://github.com/mirrorange/clove
+
+The original project author seems to have stopped updating, with the last version dated 2025.7.24. After that, Anthropic modified the output format of the web version, causing the original reverse proxy to fail.
+
+This personally maintained version has fixed the related issues, mainly including the following points:
+
+1. Line break handling, compatible with CRLF (\r\n\r\n)
+
+2. Added control for thinking mode switching through thinking:{"type":"enabled"}
+
+3. The sessionkey format is no longer limited to just sid01
+
+Below is the introduction from the original project
+
+---
+
 ## 🌟 What is this?
 
 Clove is a reverse proxy tool that lets you access Claude.ai through a standard API. In simple terms, it allows various AI applications to connect to Claude!
