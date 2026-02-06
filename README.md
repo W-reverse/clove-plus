@@ -1,4 +1,4 @@
-# Clove 🍀
+# Clove-plus 🍀
 
 <div align="center">
 
@@ -11,6 +11,24 @@
 [English](./README_en.md) | [简体中文](#)
 
 </div>
+
+## 这是一个个人维护的最新版本
+
+原项目地址：https://github.com/mirrorange/clove
+
+原项目的作者似乎已经停止了更新，最后的版本停留在2025.7.24，在这之后，Anthropic对网页版的输出格式进行了修改，原反代已失效
+
+本个人维护版对相关问题进行了修复，主要包括以下几点：
+
+1、换行符的处理，兼容了CRLF (\r\n\r\n)
+
+2、新增通过thinking:{"type":"enabled"}控制思考模式的开关
+
+3、sessionkey的格式不再仅局限于sid01
+
+以下是原项目的介绍
+
+---
 
 ## 🌟 这是什么？
 
