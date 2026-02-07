@@ -24,7 +24,9 @@ This personally maintained version has fixed the related issues, mainly includin
 
 2. Added control for thinking mode switching through thinking:{"type":"enabled"}
 
-3. The sessionkey format is no longer limited to just sid01
+3. Added online search functionality. During conversations, by emphasizing for Claude to search, it can automatically invoke the web-based internet search feature.
+
+4. The sessionkey format is no longer limited to just sid01
 
 Below is the introduction from the original project
 
